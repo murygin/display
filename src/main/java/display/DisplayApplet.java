@@ -15,74 +15,121 @@ import display.base.Text;
 
 public class DisplayApplet extends Applet implements Runnable {
 
-    Dimension offDimension;
-    Image offImage;
-    Graphics offGraphics;
+    private static String STRING_1_DEFAULT = "murygin.wordpress.com";
+    private static String STRING_2_DEFAULT = "applet art";
+    private static String STRING_3_DEFAULT = "made in berlin";
+    private static String STRING_4_DEFAULT = "#";
+    
+    private static final int RED_DEFAULT = 255;
+    private static final int GEEN_DEFAULT = 255;
+    private static final int BLUE_DEFAULT = 255;
+    
+    private static final int ANIMATION_SPEED_DEFAULT = 10;
+    private static final int PIXEL_SPEED_DEFAULT = 5;
+    
+    private static final int ARC_DEFAULT = 30;
+    
+    private static String URL_DEFAULT = "http://murygin.wordpress.com";
+    
+    private Dimension offDimension;
+    private Image offImage;
+    private Graphics offGraphics;
 
-    Thread animation;
-    boolean isRunning;
+    private Thread animation;
+    private boolean isRunning;
 
-    private int animationSpeed = 10;
+    private int animationSpeed = ANIMATION_SPEED_DEFAULT;
 
-    String url;
+    private String url;
 
-    Text text1, text2, text3, text4, displayedText;
+    private Text text1, text2, text3, text4, displayedText;
 
-    String word1, word2, word3;
-
-    Color colorDisplay;
+    private Color colorDisplay;
 
     private int arc;
 
-    boolean isMouseMode;
+    private boolean isMouseMode;
 
     // ---------------------------------------------------------
 
     @Override
     public void init() {
-        setURLString(getParameter("URL"));
         setBackground(Color.black);
-        colorDisplay = new Color(new Integer(getParameter("bgR")).intValue(), new Integer(getParameter("bgG")).intValue(), new Integer(getParameter("bgB")).intValue());
-        if (getParameter("URL") != null) {
-            setURLString(getParameter("URL"));
-        }
-        if (getParameter("speed") != null) {
-            Pkt.setSpeed(new Double(getParameter("speed")).doubleValue());
-        }
-        if (getParameter("timeout") != null) {
-            setAnimationSpeed(new Integer(getParameter("timeout")).intValue());
-        }
-        if (getParameter("arc") != null) {
-            setArc(new Integer(getParameter("arc")).intValue());
-        } else {
-            setArc(30);
-        }
         isMouseMode = true;
         isRunning = true;
         Pkt.setDisplaySize(size());
-        dispalyTextInit();
+        loadParameter();
     } // end of void init
 
-    private void dispalyTextInit() {
-        text1 = new Text(getParameter("string1"), new Dimension(5, 5));
+    private void loadParameter() {
+        loadColorParameter();     
+        loadSpeedParameter();
+        loadTextParameter();
+        setURLString(URL_DEFAULT);
+        if (getParameter("URL") != null) {
+            setURLString(getParameter("URL"));
+        }
+        setArc(ARC_DEFAULT);
+        if (getParameter("arc") != null) {
+            setArc(Integer.valueOf((getParameter("arc"))));
+        } 
+    }
+
+    private void loadColorParameter() {
+        colorDisplay = new Color(
+                getIntParameter("bgR", RED_DEFAULT), 
+                getIntParameter("bgG", GEEN_DEFAULT),
+                getIntParameter("bgB", BLUE_DEFAULT)
+        );       
+    }
+    
+    private void loadSpeedParameter() {
+        Pkt.setSpeed(PIXEL_SPEED_DEFAULT);
+        if (getParameter("speed") != null) {
+            Pkt.setSpeed(Double.valueOf(getParameter("speed")));
+        }
+        setAnimationSpeed(ANIMATION_SPEED_DEFAULT);
+        if (getParameter("timeout") != null) {
+            setAnimationSpeed(Integer.valueOf(getParameter("timeout")));
+        }
+    }
+    
+    private void loadTextParameter() {
+        text1 = new Text(getStringParameter("string1",STRING_1_DEFAULT), new Dimension(5, 5));
         text1.setPosition(new Point(Math.round((size().width - text1.getSize().width) / 2), Math.round(size().height / 2) - Math.round(text1.getSize().height / 2)));
         text1.setPaintStatus(false);
 
-        text2 = new Text(getParameter("string2"), new Dimension(5, 5));
+        text2 = new Text(getStringParameter("string2",STRING_2_DEFAULT), new Dimension(5, 5));
         text2.setPosition(new Point(Math.round((size().width - text2.getSize().width) / 2), Math.round(size().height / 2) - Math.round(text2.getSize().height / 2)));
         text2.setPaintStatus(false);
 
-        text3 = new Text(getParameter("string3"), new Dimension(5, 5));
+        text3 = new Text(getStringParameter("string3",STRING_3_DEFAULT), new Dimension(5, 5));
         text3.setPosition(new Point(Math.round((size().width - text3.getSize().width) / 2), Math.round(size().height / 2) - Math.round(text3.getSize().height / 2)));
         text3.setPaintStatus(false);
 
-        text4 = new Text(getParameter("string4"), new Dimension(5, 5));
+        text4 = new Text(getStringParameter("string4",STRING_4_DEFAULT), new Dimension(5, 5));
         text4.setPosition(new Point(Math.round((size().width - text4.getSize().width) / 2), Math.round(size().height / 2) - Math.round(text4.getSize().height / 2) - 10));
         text4.setPaintStatus(false);
 
         displayedText = new Text();
         displayedText = text1;
     } // end displayTextInit
+    
+    private int getIntParameter(String name, int defaultValue) {
+        int value = defaultValue;
+        if(getParameter(name)!=null) {
+            value = Integer.valueOf(getParameter(name));
+        }
+        return value;
+    }
+    
+    private String getStringParameter(String name, String defaultValue) {
+        String value = defaultValue;
+        if(getParameter(name)!=null) {
+            value = getParameter(name);
+        }
+        return value.toLowerCase();
+    }
 
     // ---------------------------------------------------------
 
@@ -90,24 +137,24 @@ public class DisplayApplet extends Applet implements Runnable {
         return url;
     }
 
-    public void setURLString(String p_sURL) {
-        url = p_sURL;
+    public void setURLString(String url) {
+        this.url = url;
     }
 
     public int getAnimationSpeed() {
         return animationSpeed;
     }
 
-    public void setAnimationSpeed(int p_nSpeed) {
-        animationSpeed = p_nSpeed;
+    public void setAnimationSpeed(int speed) {
+        animationSpeed = speed;
     }
 
     public int getArc() {
         return arc;
     }
 
-    public void setArc(int p_nArc) {
-        arc = p_nArc;
+    public void setArc(int arc) {
+        this.arc = arc;
     }
 
     // ---------------------------------------------------------
@@ -154,7 +201,7 @@ public class DisplayApplet extends Applet implements Runnable {
                     } else {
                         if (displayedText.getText().equals(text4.getText())) {
                             oldText = text4;
-                            dispalyTextInit();
+                            loadTextParameter();
                         }
                     }
                 }
@@ -255,4 +302,4 @@ public class DisplayApplet extends Applet implements Runnable {
         return true;
     }
 
-} // end of class Berlin
+} // end of class
