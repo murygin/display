@@ -15,13 +15,13 @@ public class Zeichen {
     public static final int N_MAX_ZEICHEN_BREITE = 53;
     public static final int N_MAX_ZEICHEN_HOEHE = 20;
 
-    protected Pkt m_pktMatrix[][];
+    protected Pkt pktMatrix[][];
     protected Point zielpunkte[];
-    private int m_nNumberOfPkt = 0;
-    protected int m_nWidth, m_nHeight;
+    private int numberOfPkt = 0;
+    protected int width, height;
     int index = 0;
 
-    private Point m_ptZeichenPos;
+    private Point zeichenPos;
 
     // ___________________________________________________________________________
 
@@ -39,7 +39,7 @@ public class Zeichen {
     public Zeichen(char p_chZeichen, Dimension p_dimPktSize) {
         int x, y, maxX = 0, maxY = 0;
         setZielpunkte(p_chZeichen);
-        m_pktMatrix = new Pkt[N_MAX_ZEICHEN_BREITE][N_MAX_ZEICHEN_HOEHE];
+        pktMatrix = new Pkt[N_MAX_ZEICHEN_BREITE][N_MAX_ZEICHEN_HOEHE];
         for (int i = 0; i < zielpunkte.length; i++) {
             x = zielpunkte[i].x;
             y = zielpunkte[i].y;
@@ -49,10 +49,10 @@ public class Zeichen {
             if (y > maxY) {
                 maxY = y;
             }
-            m_pktMatrix[x][y] = new Pkt(new Point(x * p_dimPktSize.width, y * p_dimPktSize.height), null, p_dimPktSize);
+            pktMatrix[x][y] = new Pkt(new Point(x * p_dimPktSize.width, y * p_dimPktSize.height), null, p_dimPktSize);
         }
-        m_nWidth = (maxX + 1) * Pkt.DM_SIZE.width;
-        m_nHeight = (maxY + 1) * Pkt.DM_SIZE.height;
+        width = (maxX + 1) * Pkt.DM_SIZE.width;
+        height = (maxY + 1) * Pkt.DM_SIZE.height;
     }
 
     /**
@@ -69,9 +69,9 @@ public class Zeichen {
     public Zeichen(char p_chZeichen, Point p_ptZeichenPos, Dimension p_dimPktSize) {
         int x, y, maxX = 0, maxY = 0;
         Vector vecCurrRow;
-        m_ptZeichenPos = p_ptZeichenPos;
+        zeichenPos = p_ptZeichenPos;
         setZielpunkte(p_chZeichen);
-        m_pktMatrix = new Pkt[N_MAX_ZEICHEN_BREITE][N_MAX_ZEICHEN_HOEHE];
+        pktMatrix = new Pkt[N_MAX_ZEICHEN_BREITE][N_MAX_ZEICHEN_HOEHE];
         for (int i = 0; i < zielpunkte.length; i++) {
             x = zielpunkte[i].x;
             y = zielpunkte[i].y;
@@ -81,10 +81,10 @@ public class Zeichen {
             if (y > maxY) {
                 maxY = y;
             }
-            m_pktMatrix[x][y] = new Pkt(new Point(x * p_dimPktSize.width + m_ptZeichenPos.x, y * p_dimPktSize.height + m_ptZeichenPos.y), null, p_dimPktSize);
+            pktMatrix[x][y] = new Pkt(new Point(x * p_dimPktSize.width + zeichenPos.x, y * p_dimPktSize.height + zeichenPos.y), null, p_dimPktSize);
         }
-        m_nWidth = (maxX + 1) * Pkt.DM_SIZE.width;
-        m_nHeight = (maxY + 1) * Pkt.DM_SIZE.height;
+        width = (maxX + 1) * Pkt.DM_SIZE.width;
+        height = (maxY + 1) * Pkt.DM_SIZE.height;
     }
 
     // ___________________________________________________________________________
@@ -99,11 +99,11 @@ public class Zeichen {
     }
 
     public Pkt getPkt(int p_nIndex) {
-        return m_pktMatrix[zielpunkte[p_nIndex].x][zielpunkte[p_nIndex].y];
+        return pktMatrix[zielpunkte[p_nIndex].x][zielpunkte[p_nIndex].y];
     }
 
     public Dimension getSize() {
-        return new Dimension(m_nWidth, m_nHeight);
+        return new Dimension(width, height);
     }
 
     // ___________________________________________________________________________
@@ -122,11 +122,11 @@ public class Zeichen {
      */
     public boolean addPunkt(Point p_ptPos, Color p_clColor) {
         Pkt currPkt;
-        if (m_nNumberOfPkt < zielpunkte.length) {
-            currPkt = m_pktMatrix[zielpunkte[m_nNumberOfPkt].x][zielpunkte[m_nNumberOfPkt].y];
+        if (numberOfPkt < zielpunkte.length) {
+            currPkt = pktMatrix[zielpunkte[numberOfPkt].x][zielpunkte[numberOfPkt].y];
             currPkt.setPos(p_ptPos);
             currPkt.setPaintStatus(true);
-            m_nNumberOfPkt++;
+            numberOfPkt++;
             return true;
         } else {
             return false;
@@ -141,8 +141,8 @@ public class Zeichen {
         Pkt currPkt;
         Point ptCurrPos;
         for (int i = 0; i < zielpunkte.length; i++) {
-            currPkt = m_pktMatrix[zielpunkte[i].x][zielpunkte[i].y];
-            ptCurrPos = new Point(m_ptZeichenPos.x + zielpunkte[i].x * currPkt.getSize().width, m_ptZeichenPos.y + zielpunkte[i].y * currPkt.getSize().height);
+            currPkt = pktMatrix[zielpunkte[i].x][zielpunkte[i].y];
+            ptCurrPos = new Point(zeichenPos.x + zielpunkte[i].x * currPkt.getSize().width, zeichenPos.y + zielpunkte[i].y * currPkt.getSize().height);
             currPkt.setPos(ptCurrPos);
             currPkt.setPaintStatus(true);
         }
@@ -159,8 +159,8 @@ public class Zeichen {
         Pkt currPkt;
         Point ptCurrPos;
         for (int i = 0; i < zielpunkte.length; i++) {
-            currPkt = m_pktMatrix[zielpunkte[i].x][zielpunkte[i].y];
-            ptCurrPos = new Point(m_ptZeichenPos.x + zielpunkte[i].x * currPkt.getSize().width, p_nY);
+            currPkt = pktMatrix[zielpunkte[i].x][zielpunkte[i].y];
+            ptCurrPos = new Point(zeichenPos.x + zielpunkte[i].x * currPkt.getSize().width, p_nY);
             currPkt.setPos(ptCurrPos);
             currPkt.setPaintStatus(true);
         }
@@ -177,8 +177,8 @@ public class Zeichen {
         Pkt currPkt;
         Point ptCurrPos;
         for (int i = 0; i < zielpunkte.length; i++) {
-            currPkt = m_pktMatrix[zielpunkte[i].x][zielpunkte[i].y];
-            ptCurrPos = new Point(p_nX, m_ptZeichenPos.y + zielpunkte[i].y * currPkt.getSize().height);
+            currPkt = pktMatrix[zielpunkte[i].x][zielpunkte[i].y];
+            ptCurrPos = new Point(p_nX, zeichenPos.y + zielpunkte[i].y * currPkt.getSize().height);
             currPkt.setPos(ptCurrPos);
             currPkt.setPaintStatus(true);
         }
@@ -194,10 +194,10 @@ public class Zeichen {
     public void setPosition(Point p_ptNewPosition) {
         Pkt currPkt;
         Point ptCurrPos;
-        m_ptZeichenPos = p_ptNewPosition;
+        zeichenPos = p_ptNewPosition;
         for (int i = 0; i < zielpunkte.length; i++) {
-            currPkt = m_pktMatrix[zielpunkte[i].x][zielpunkte[i].y];
-            ptCurrPos = new Point(m_ptZeichenPos.x + zielpunkte[i].x * currPkt.getSize().width, m_ptZeichenPos.y + zielpunkte[i].y * currPkt.getSize().height);
+            currPkt = pktMatrix[zielpunkte[i].x][zielpunkte[i].y];
+            ptCurrPos = new Point(zeichenPos.x + zielpunkte[i].x * currPkt.getSize().width, zeichenPos.y + zielpunkte[i].y * currPkt.getSize().height);
             currPkt.setZiel(ptCurrPos);
         }
     }
@@ -212,7 +212,7 @@ public class Zeichen {
      */
     public void setPaintStatus(boolean p_bNewPaintStatus) {
         for (int i = 0; i < zielpunkte.length; i++) {
-            m_pktMatrix[zielpunkte[i].x][zielpunkte[i].y].setPaintStatus(p_bNewPaintStatus);
+            pktMatrix[zielpunkte[i].x][zielpunkte[i].y].setPaintStatus(p_bNewPaintStatus);
         }
     }
 
@@ -223,7 +223,7 @@ public class Zeichen {
      * werden -> nextPosition() liefert true -> Animation beginnt wieder
      */
     public void setNumberOfPkt(int p_nNewNumberOfPkt) {
-        m_nNumberOfPkt = p_nNewNumberOfPkt;
+        numberOfPkt = p_nNewNumberOfPkt;
     }
 
     protected void setZielpunkte(char zeichen) {
@@ -382,13 +382,18 @@ public class Zeichen {
     } // end setZielpunkte
 
     public boolean isComplete() {
-        return (m_nNumberOfPkt >= zielpunkte.length);
+        return (numberOfPkt >= zielpunkte.length);
     }
 
+    /**
+     * Sets the next position of all pixels in this charakter.
+     * 
+     * @return true if all pixels are set, false if not 
+     */
     public boolean nextPosition() {
         boolean ready = true;
         for (int i = 0; i < zielpunkte.length; i++) {
-            if (!m_pktMatrix[zielpunkte[i].x][zielpunkte[i].y].nextPosition()) {
+            if (!pktMatrix[zielpunkte[i].x][zielpunkte[i].y].nextPosition()) {
                 ready = false;
             }
         }
@@ -399,7 +404,7 @@ public class Zeichen {
 
     public void paint(Graphics p_G) {
         for (int i = 0; i < zielpunkte.length; i++) {
-            m_pktMatrix[zielpunkte[i].x][zielpunkte[i].y].paint(p_G);
+            pktMatrix[zielpunkte[i].x][zielpunkte[i].y].paint(p_G);
         }
     }
 

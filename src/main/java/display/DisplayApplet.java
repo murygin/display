@@ -17,21 +17,21 @@ public class DisplayApplet extends Applet implements Runnable {
 
     private static String STRING_1_DEFAULT = "murygin.wordpress.com";
     private static String STRING_2_DEFAULT = "applet art";
-    private static String STRING_3_DEFAULT = "made in berlin";
-    private static String STRING_4_DEFAULT = "#";
+    private static String STRING_3_DEFAULT = "# made in berlin #";
+    private static String STRING_4_DEFAULT = "click here &";
     
-    private static final int RED_DEFAULT = 255;
-    private static final int GEEN_DEFAULT = 255;
-    private static final int BLUE_DEFAULT = 255;
+    private static final int RED_DEFAULT = 102;
+    private static final int GEEN_DEFAULT = 153;
+    private static final int BLUE_DEFAULT = 102;
     
     private static final int ANIMATION_SPEED_DEFAULT = 10;
     private static final int PIXEL_SPEED_DEFAULT = 5;
     
-    private static final int ARC_DEFAULT = 30;
+    private static final int ARC_DEFAULT = 15;
     
     private static String URL_DEFAULT = "http://murygin.wordpress.com";
     
-    private Dimension offDimension;
+    private Dimension appletSize;
     private Image offImage;
     private Graphics offGraphics;
 
@@ -39,6 +39,7 @@ public class DisplayApplet extends Applet implements Runnable {
     private boolean isRunning;
 
     private int animationSpeed = ANIMATION_SPEED_DEFAULT;
+    private int holdTime = 20;
 
     private String url;
 
@@ -54,6 +55,7 @@ public class DisplayApplet extends Applet implements Runnable {
 
     @Override
     public void init() {
+        appletSize = size();
         setBackground(Color.black);
         isMouseMode = true;
         isRunning = true;
@@ -111,7 +113,7 @@ public class DisplayApplet extends Applet implements Runnable {
         text4.setPosition(new Point(Math.round((size().width - text4.getSize().width) / 2), Math.round(size().height / 2) - Math.round(text4.getSize().height / 2) - 10));
         text4.setPaintStatus(false);
 
-        displayedText = new Text();
+        displayedText = new Text(appletSize.width, appletSize.height);
         displayedText = text1;
     } // end displayTextInit
     
@@ -170,22 +172,35 @@ public class DisplayApplet extends Applet implements Runnable {
 
     @Override
     public void run() {
-        int nds = 20;
-        Text oldText = new Text();
-        while (!displayedText.nextPosition() || !displayedText.isComplete()) {
-            try {
-                Thread.sleep(20);
-            } catch (InterruptedException ie) {
-            }
-            repaint();
-        }
+        runMouseMode();      
         isMouseMode = false;
 
         try {
-            Thread.sleep(nds * 100);
+            Thread.sleep(holdTime * 100);
         } catch (InterruptedException ie) {
         }
-        nds = 20;
+        
+        runAnimationLoop();
+    } // end of void run
+
+    /**
+     * Starts and runs the mouse mode.
+     */
+    private void runMouseMode() {
+        while (!displayedText.nextPosition() || !displayedText.isComplete()) {
+            try {
+                Thread.sleep(getAnimationSpeed());
+            } catch (InterruptedException ie) {
+            }
+            repaint();
+         }
+    }
+    
+    /**
+     * Starts and run the animation loop
+     */
+    private void runAnimationLoop() {
+        Text oldText = new Text();
         while (isRunning) {
             if (displayedText.getText().equals(text1.getText())) {
                 oldText = text1;
@@ -207,19 +222,7 @@ public class DisplayApplet extends Applet implements Runnable {
                 }
             }
 
-            /*
-             * for( int i=0; i<oldText.getNumberOfZeichen(); i++ ) { Zeichen
-             * oldZeichen = oldText.getZeichen(i); for( int k=0;
-             * k<oldZeichen.getNumberOfPkt(); k++ ) m_DisplayedText.addPunkt(
-             * new Point( oldZeichen.getPkt(k).getPos().x,
-             * oldZeichen.getPkt(k).getPos().y ), Color.black ); }
-             * 
-             * int mittelindex = Math.round(oldText.getText().length() / 2);
-             * while( m_DisplayedText.addPunkt( new Point( Math.round(
-             * size().width/2 ), Math.round( size().height/2 ) ), Color.black )
-             * ) { //nichts }
-             */
-            displayedText.switchTo(oldText);
+            displayedText.switchTo(oldText,appletSize.width, appletSize.height);
 
             while (!displayedText.nextPosition()) {
                 try {
@@ -229,11 +232,11 @@ public class DisplayApplet extends Applet implements Runnable {
                 repaint();
             }
             try {
-                Thread.sleep(nds * 100);
+                Thread.sleep(holdTime * 100);
             } catch (InterruptedException ie) {
             }
-        } // ende xmal Schleife
-    } // end of void run
+        } // ende while
+    }
 
     private void switchTo(Text newText) {
         displayedText = newText;
@@ -250,15 +253,14 @@ public class DisplayApplet extends Applet implements Runnable {
 
     @Override
     public void update(Graphics g) {
-        Dimension d = size();
-        if ((offGraphics == null) || (d.width != offDimension.width) || (d.height != offDimension.height)) {
-            offDimension = d;
-            offImage = createImage(d.width, d.height);
+        appletSize = size();
+        if ((offGraphics == null) ) {
+            offImage = createImage(appletSize.width, appletSize.height);
             offGraphics = offImage.getGraphics();
         }
         // Erase the previous image.
         offGraphics.setColor(getBackground());
-        offGraphics.fillRect(0, 0, d.width, d.height);
+        offGraphics.fillRect(0, 0, appletSize.width, appletSize.height);
 
         offGraphics.setColor(colorDisplay);
         offGraphics.fillRoundRect(0, 0, size().width, size().height, getArc(), getArc());
