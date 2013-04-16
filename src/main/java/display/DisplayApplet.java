@@ -29,7 +29,7 @@ public class DisplayApplet extends Applet implements Runnable {
     
     private static final int ARC_DEFAULT = 15;
     
-    private static String URL_DEFAULT = "http://murygin.wordpress.com";
+    private static String URL_DEFAULT = "http://murygin.wordpress.com/2013/04/16/applet-animation-display";
     
     private Dimension appletSize;
     private Image offImage;
